@@ -52,7 +52,6 @@ proc decode*(compressedBytes: seq[byte]): seq[byte] =
         discard src.read(huffmanSymbolBitLength)
         if huffmanSymbol < 256:
           stdout.write $huffmanSymbol & " "
-          result.add(huffmanSymbol.byte)
         else:
           huffmanSymbol -= 256
           let matchDistanceBitLength = huffmanSymbol shr 4
@@ -69,8 +68,5 @@ proc decode*(compressedBytes: seq[byte]): seq[byte] =
           let matchDistance = src.read(matchDistanceBitLength.int) +
                             (1'u32 shl matchDistanceBitLength)
 
-          #stdout.write $huffmanSymbol & "(" & $matchLength & "," & $matchDistance & ")["
           for _ in 0'u16 ..< matchLength:
-          #  stdout.write $result[^matchDistance.int] & " "
             result.add(result[^matchDistance.int])
-          #stdout.write "\b] "
