@@ -13,9 +13,6 @@ proc fetchBits(wbs: WordBitStream) =
   wbs.pos += 2
   wbs.bits += 16
 
-#proc atEnd*(wbs: WordBitStream): bool =
-#  return wbs.pos >= wbs.data.len
-
 ## Return the next `n` bits as an integer. Bits are not consumed
 proc peek*(wbs: WordBitStream, n: int): uint32 =
   if n == 0: 0'u32
