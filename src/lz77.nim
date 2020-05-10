@@ -1,5 +1,5 @@
-## Implementation of Microsoft's LZ77+Huffman Decompression Algorithm
-## Based on section 2.2 of [MS-XCA] document
+## Implementation of LZ77+Huffman Decompression Algorithm
+## Based on section 2.2 of Microsoft's [MS-XCA] document
 
 import math, bitstream, huffman, sequtils
 
