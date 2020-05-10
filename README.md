@@ -1,2 +1,7 @@
 # Implementation of LZ77 algorithms
-**Note:** The initial goal is to implement the LZ77+Huffman decompression algorithm in order to decode Windows [Pre/Super]fetch files.
+### **Motivation**
+This project was motivated by the attempt to write an os-agnostic parser for Windows Prefetch files.  
+Most parsers use the Windows API to decompress MAM data (found in Prefetch and Superfetch files), which means they only work on Windows 8.1 & 10.
+
+### **Generality of implementation**
+I will try to make the implementation as general as possible, but for now I am following Microsoft's conventions.
