@@ -1,5 +1,3 @@
-import strutils
-
 type BitStream* = ref object
   data: seq[byte]
   pos*: int
@@ -36,7 +34,7 @@ proc close*(bs: BitStream) =
   else:
     bs.data = nil
 
-proc newBitStream*(s: seq[byte] = @[]): owned BitStream =
+proc newBitStream*(s: seq[byte] = @[]): BitStream =
   new(result)
   result.data = s
   result.fetchBits

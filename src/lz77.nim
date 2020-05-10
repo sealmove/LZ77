@@ -1,9 +1,9 @@
 ## Implementation of LZ77+Huffman Decompression Algorithm
-## Based on section 2.2 of Microsoft's [MS-XCA] document
+## Based on Microsoft documents: MS-XCA (2.2) & MS-FRS2 (3.1.1.1.3)
 
-import math, bitstream, huffman, sequtils
+import math, bitstream, huffman
 
-proc decompress*(bytes: seq[byte]): tuple[processedCnt: int, data: seq[byte]] =
+proc huffmanDecompress*(bytes: seq[byte]): tuple[count: int, data: seq[byte]] =
   let
     tree = newHuffmanTree(bytes[0 .. 255])
     stream = newBitStream(bytes[256 .. ^1])
@@ -29,4 +29,4 @@ proc decompress*(bytes: seq[byte]): tuple[processedCnt: int, data: seq[byte]] =
 
       for _ in 0 ..< len:
         result.add(result[^matchDistance.int])
-  result.processedCnt = 256 + stream.pos
+  result.count = 256 + stream.pos
