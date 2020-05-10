@@ -26,7 +26,7 @@ proc peek*(bs: BitStream, n: int): uint32 =
 ## Return the next `n` bits as an integer. Bits are consumed.
 proc read*(bs: BitStream, n: int): uint32 =
   result = bs.peek(n)
-  skip(n)
+  bs.skip(n)
 
 proc close*(bs: BitStream) =
   when defined(nimNoNilSeqs):
