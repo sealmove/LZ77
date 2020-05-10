@@ -1,7 +1,7 @@
 ## Implementation of LZ77+Huffman Decompression Algorithm
 ## Based on Microsoft documents: MS-XCA (2.2) & MS-FRS2 (3.1.1.1.3)
 
-import math, bitstream, huffman
+import math, lz77/[bitstream, huffman]
 
 proc huffmanDecompress*(bytes: seq[byte]): tuple[count: int, data: seq[byte]] =
   let
