@@ -10,7 +10,6 @@ proc decompressHuffman*(input: seq[byte], output: var seq[byte]) =
     stream = newBitStream(input[256 .. ^1])
 
   while output.len < blockEnd and not stream.atEnd:
-    echo output.len
     var symbol = tree.decode(stream)
     if symbol < 256:
       output.add(symbol.byte)
