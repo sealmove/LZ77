@@ -28,6 +28,14 @@ proc read*(bs: BitStream, n: int): uint32 =
   result = bs.peek(n)
   bs.skip(n)
 
+proc currentByte*(bs: BitStream): byte =
+  bs.data[bs.pos]
+
+proc currentWord*(bs: BitStream): uint16 =
+  var word: uint16
+  copyMem(addr(word), addr(bs.data[bs.pos]), 2)
+  result = word
+
 proc close*(bs: BitStream) =
   when defined(nimNoNilSeqs):
     bs.data = @[]

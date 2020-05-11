@@ -1,50 +1,86 @@
 import bitstream, algorithm
 
 type
-  HuffmanTree* = ref object
-    nodes: array[1024, int]
-    root: HuffmanNode
-  HuffmanNode = ref object
-    symbol: int
+  HuffmanNode* = ref object
     case isLeaf: bool
-    of true: left, right: HuffmanNode
-    of false: discard
-  Symbol = tuple[len: CodeLen, code: int]
+    of true: code: int
+    of false: children: array[2, HuffmanNode]
+  Symbol = tuple[code: int, length: CodeLen]
   # Safe bit storage
   CodeLenBits {.size: sizeof(cint).} = enum
     A, B, C, D
   CodeLen = set[CodeLenBits]
 
 proc toNum(bits: CodeLen): int = cast[cint](bits)
+proc len(s: Symbol): int = toNum(s.length)
 proc toBits(b: byte): CodeLen = cast[CodeLen](b)
-proc `<`(x, y: CodeLen): bool = x.toNum < y.toNum
+proc compare(a, b: Symbol): int =
+  if a.len < b.len: -1
+  elif a.len > b.len: 1
+  elif a.code < b.code: -1
+  elif a.code > b.code: 1
+  else: 0
 
-proc newHuffmanTree*(input: openArray[byte]): HuffmanTree =
+proc addLeaf(nodes: var array[1024, HuffmanNode]; leaf, mask, bits: int): int =
+  var
+    mask = mask
+    bits = bits
+    i = leaf + 1
+    node = nodes[0]
+  while bits > 1:
+    dec bits
+    let bit = (mask shr bits) and 1
+    if node.children[bit] == nil:
+      nodes[i] = new(HuffmanNode)
+      node.children[bit] = nodes[i]
+      inc i
+    node = node.children[bit]
+  node.children[mask and 1] = nodes[leaf]
+  return i
+
+proc newHuffmanTree*(input: openArray[byte]): HuffmanNode =
   # The input is 256 bytes.
   # It consists of 512 numbers that represent bit lengths of symbols.
   # Each number is stored in 4 bits.
   # For each bytes, the least significant bits should be read first.
   # The first 256 symbols represent ascii characters.
   # The remaining 256 symbols represent references to compressed tuples.
-  var symbols {.noInit.}: array[512, Symbol]
+  var
+    symbols: array[512, Symbol]
+    nodes: array[1024, HuffmanNode]
+
+  nodes[0] = new(HuffmanNode)
+  result = nodes[0]
 
   for i in 0 ..< 256:
     let b = input[i]
-    symbols[2*i]   = (toBits(b and 15), 2*i)
-    symbols[2*i+1] = (toBits(b shr 4), 2*i+1)
+    symbols[2*i]   = (2*i, toBits(b and 15))
+    symbols[2*i+1] = (2*i+1, toBits(b shr 4))
 
-  sort symbols
-
-  # Testing
-  when isMainModule:
-    for s in symbols:
-      echo $s.code & ": " & $s.len.toNum
+  symbols.sort(compare)
 
   # Skip unused symbols
-  var i: int
-  while i < 512 and toNum(symbols[0].len) == 0: inc i
+  var x: int; while x < 512 and symbols[x].len == 0: inc x
 
-proc read(tree: HuffmanTree): int = discard
+  var
+    j = 1
+    mask, bits: int
+
+  for i in x ..< 512:
+    nodes[j] = HuffmanNode(isLeaf: true, code: symbols[i].code)
+    mask = mask shl (symbols[i].len - bits)
+    bits = symbols[i].len
+    j = nodes.addLeaf(j, mask, bits)
+    inc mask
+
+proc decode*(root: HuffmanNode, bs: BitStream): int =
+  var
+    bit: uint
+    node = root
+  while not node.isLeaf:
+    bit = bs.read(1)
+    node = node.children[bit]
+  result = node.code
 
 # Testing
 when isMainModule:
