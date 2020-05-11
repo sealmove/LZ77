@@ -36,6 +36,9 @@ proc currentWord*(bs: BitStream): uint16 =
   copyMem(addr(word), addr(bs.data[bs.pos]), 2)
   result = word
 
+proc atEnd*(bs: BitStream):bool =
+  bs.pos >= bs.data.len
+
 proc close*(bs: BitStream) =
   when defined(nimNoNilSeqs):
     bs.data = @[]

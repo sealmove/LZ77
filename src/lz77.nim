@@ -3,16 +3,17 @@
 
 import math, lz77/[bitstream, huffman]
 
-proc huffmanDecompress*(bytes: seq[byte]): tuple[count: int, data: seq[byte]] =
+proc decompressHuffman*(input: seq[byte], output: var seq[byte]) =
   let
-    tree = newHuffmanTree(bytes[0 .. 255])
-    stream = newBitStream(bytes[256 .. ^1])
-    blockEnd = result.data.len + 65536
+    blockEnd = output.len + 65536
+    tree = newHuffmanTree(input[0 ..< 256])
+    stream = newBitStream(input[256 .. ^1])
 
-  while result.data.len < blockEnd:
+  while output.len < blockEnd and not stream.atEnd:
+    echo output.len
     var symbol = tree.decode(stream)
     if symbol < 256:
-      result.data.add(symbol.byte)
+      output.add(symbol.byte)
     else:
       let distBitLen = int((symbol and 0xF0) shr 4)
       var len = symbol and 0x0F
@@ -29,8 +30,11 @@ proc huffmanDecompress*(bytes: seq[byte]): tuple[count: int, data: seq[byte]] =
       stream.skip(distBitLen)
       len += 3
 
-      let l = result.data.len
-      for i in 0 ..< len:
-        let b = result.data[l - dist.int + i]
-        result.data.add(b)
-  result.count = 256 + stream.pos
+      for _ in 0 ..< len:
+        let l = output.len
+        let b = output[l - dist.int]
+        output.add(b)
+
+proc decompressMam*(bytes: seq[byte], size: SomeInteger): seq[byte] =
+  while result.len < size.int:
+    decompressHuffman(bytes, result)
